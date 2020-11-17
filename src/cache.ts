@@ -6,16 +6,16 @@ interface CacheKeyData {
   client_id: string;
 }
 
-interface DecodedToken {
+interface DecodedToken<TUser> {
   claims: IdToken;
-  user: any;
+  user: TUser;
 }
 
-interface CacheEntry {
+interface CacheEntry<TUser = any> {
   id_token: string;
   access_token: string;
   expires_in: number;
-  decodedToken: DecodedToken;
+  decodedToken: DecodedToken<TUser>;
   audience: string;
   scope: string;
   client_id: string;
@@ -23,8 +23,11 @@ interface CacheEntry {
 }
 
 export interface ICache {
-  save(entry: CacheEntry): void;
-  get(key: CacheKeyData, expiryAdjustmentSeconds?: number): Partial<CacheEntry>;
+  save<TUser>(entry: CacheEntry<TUser>): void;
+  get<TUser>(
+    key: CacheKeyData,
+    expiryAdjustmentSeconds?: number
+  ): Partial<CacheEntry<TUser>>;
   clear(): void;
 }
 
@@ -34,8 +37,8 @@ const DEFAULT_EXPIRY_ADJUSTMENT_SECONDS = 0;
 const createKey = (e: CacheKeyData) =>
   `${keyPrefix}::${e.client_id}::${e.audience}::${e.scope}`;
 
-type CachePayload = {
-  body: Partial<CacheEntry>;
+type CachePayload<TUser = any> = {
+  body: Partial<CacheEntry<TUser>>;
   expiresAt: number;
 };
 
